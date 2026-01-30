@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Lobby • WebRTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+
+<body>
+  <header>
+    <div class="pill">🎥 WebRTC</div>
+    <div class="pill">👤 {{ username }}</div>
+    <div class="spacer"></div>
+    <a class="btn danger" href="/logout">Logout</a>
+    <a class="btn" href="/change-password">Change password</a>
+    <a class="btn" href="/settings">Settings</a>
+  </header>
+
+  <main class="grid">
+
+    <section class="panel">
+      <h3>Create a private room</h3>
+      <p>Generate a new room and share the invite with someone.</p>
+      <form method="POST" action="/create-room" class="actions">
+        <button type="submit">Create room</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h3>Join from an invite link</h3>
+      <label for="invite">Paste invite link</label>
+      <input id="invite" placeholder="https://YOUR_HOST/join/<room_id>?key=<private_key>">
+
+      <div class="actions">
+        <button type="button" onclick="goInvite()">Join by link</button>
+      </div>
+
+      <small>Tip: If the link includes <code>?key=...</code>, you’ll auto-join.</small>
+    </section>
+
+    <section class="panel span2">
+      <h3>Join manually</h3>
+      <form method="POST" action="/join-direct">
+        <label for="room_id">Room ID</label>
+        <input id="room_id" name="room_id" required placeholder="e.g. AaBbCcDd">
+
+        <label for="key">Private key</label>
+        <input id="key" name="key" required placeholder="Paste the private key">
+
+        <div class="actions">
+          <button type="submit">Join room</button>
+        </div>
+      </form>
+      <small>Ask the room owner for the Room ID and Private Key.</small>
+    </section>
+
+  </main>
+
+  <script>
+    function goInvite() {
+      const v = document.getElementById('invite').value.trim();
+      if (!v) return;
+      try {
+        const u = new URL(v);
+        if (!u.pathname.startsWith('/join/')) { alert('Invalid invite link'); return; }
+        window.location.href = u.href;
+      } catch (e) {
+        alert('Invalid invite link');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Join room • WebRTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+
+<body>
+  <header>
+    <div class="pill">🎥 WebRTC</div>
+    <div class="pill">Join room</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Join room: <code>{{ room_id }}</code></h2>
+      <p>Paste the private key you received from the room owner.</p>
+
+      {% if bad_key %}
+        <div class="error">
+          ❌ Invalid key. Please try again.
+        </div>
+      {% endif %}
+
+      <form method="POST">
+        <label>Private key</label>
+        <input name="key" required placeholder="Paste the key from your invite">
+
+        <div class="actions">
+          <button type="submit">Join room</button>
+          <a class="btn" href="/lobby">Back to Lobby</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

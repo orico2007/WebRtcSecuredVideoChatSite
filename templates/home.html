@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Video Chat • Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+
+<body>
+  <header>
+    <div class="pill">🎥 WebRTC</div>
+    <div class="pill">Login</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h1>Login</h1>
+      <p>Enter your username and password.</p>
+
+      <form method="POST" action="/login">
+        <label>Username</label>
+        <input name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <div class="controls">
+          <button type="submit">Login</button>
+          <a class="btn" href="/register">Create account</a>
+        </div>
+      </form>
+
+      <div class="linkrow">
+        Need verification? <a href="/resend">Resend verification email</a>
+      </div>
+      <div style="margin-top:10px;">
+        <a href="/forgot-password" style="color:#c9d3ff; text-decoration:none;">Forgot password?</a>
+      </div>
+
+    </section>
+  </main>
+</body>
+</html>

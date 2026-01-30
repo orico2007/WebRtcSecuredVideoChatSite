@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Register • Video Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+
+<body>
+  <header>
+    <div class="pill">🎥 WebRTC</div>
+    <div class="pill">Register</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h1>Create an account</h1>
+      <p>Choose a username, add your email, and set a password.</p>
+
+      <form method="POST" action="/register">
+        <label>Username</label>
+        <input name="username" required>
+
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <div class="controls">
+          <button type="submit">Register</button>
+          <a class="btn" href="/">Back to login</a>
+        </div>
+      </form>
+
+      <div class="linkrow">
+        Already have an account? <a href="/">Login here</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

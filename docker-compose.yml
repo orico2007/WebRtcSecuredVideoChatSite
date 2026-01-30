@@ -1,0 +1,47 @@
+services:
+  db:
+    image: alpine:3.20
+    container_name: webrtc-sqlite-db
+    command: ["sh", "-c", "mkdir -p /data && touch /data/users.db && tail -f /dev/null"]
+    volumes:
+      - webrtc_sqlite:/data
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: webrtc-app
+    command: ["python", "app.py"]
+    depends_on:
+      - db
+    ports:
+      - "34535:34535"
+    environment:
+      DB_PATH: "/data/users.db"
+      HOST: "0.0.0.0"
+      PORT: "34535"
+      TLS_CERT: "crt/server.crt"
+      TLS_KEY: "crt/server.key"
+    volumes:
+      - webrtc_sqlite:/data
+    restart: unless-stopped
+
+  signaling:
+    build: .
+    container_name: webrtc-signaling
+    command: ["python", "signaling.py"]
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      DB_PATH: "/data/users.db"
+      WS_HOST: "0.0.0.0"
+      WS_PORT: "8000"
+      TLS_CERT: "crt/server.crt"
+      TLS_KEY: "crt/server.key"
+    volumes:
+      - webrtc_sqlite:/data
+    restart: unless-stopped
+
+volumes:
+  webrtc_sqlite:

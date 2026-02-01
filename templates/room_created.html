@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Room created • WebRTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+
+<body>
+  <header>
+    <div class="pill">🎉 Room created</div>
+    <div class="pill">🪪 {{ room_id }}</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h1>Share these details</h1>
+      <p>Send the invite link (or room id + private key) to the other user.</p>
+
+      <div class="row">
+        <div><b>Room ID:</b> <code>{{ room_id }}</code></div>
+        <div><b>Private key:</b> <code>{{ room_key }}</code></div>
+
+        <div style="margin-top:8px;"><b>Invite link:</b></div>
+        <input readonly value="{{ join_link }}" onclick="this.select();document.execCommand('copy');" />
+        <small>Click the input to auto-select and copy.</small>
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="/room/{{ room_id }}">Enter the room</a>
+        <a class="btn" href="/lobby">Back to Lobby</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

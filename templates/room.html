@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Room {{ room_id }} • WebRTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/room.css">
+</head>
+
+<body>
+
+<header>
+  <div class="pill">👤 {{ username }}</div>
+  <div class="pill">🪪 Room: {{ room_id }}</div>
+  <a class="btn" href="/settings?return=/room/{{ room_id }}">Settings</a>
+  <div id="banner"></div>
+
+</header>
+
+<main class="grid">
+
+  <section class="panel">
+    <div class="pill" style="margin-bottom:8px;">Local preview</div>
+    <video id="localVideo" autoplay playsinline muted></video>
+
+    <div class="pill" style="margin:12px 0 8px;">Screen preview</div>
+    <video id="localScreen" autoplay playsinline muted></video>
+
+    <div class="controls">
+      <button id="btnMute">Mute</button>
+      <button id="btnCamera">Camera off</button>
+      <button id="btnShare">Share screen</button>
+      <button id="btnHangup" class="danger">Hang up</button>
+    </div>
+        <!-- DEVICES -->
+    <div class="devices-panel">
+      <div class="pill">Devices</div>
+
+      <div class="device-row">
+        <label for="micSelect">Mic</label>
+        <select id="micSelect">
+          <option value="">Default</option>
+        </select>
+      </div>
+
+      <div class="device-row">
+        <label for="camSelect">Camera</label>
+        <select id="camSelect">
+          <option value="">Default</option>
+        </select>
+      </div>
+
+      <div class="device-row">
+        <label for="spkSelect">Speakers</label>
+        <select id="spkSelect">
+          <option value="">Default</option>
+        </select>
+      </div>
+
+      <div class="device-hint">
+        Speaker switching works only in supported browsers over HTTPS.
+      </div>
+    </div>
+
+  </section>
+
+  <section class="panel">
+    <div class="pill" style="margin-bottom:8px;">Participants</div>
+    <div id="remotes"></div>
+
+    <div class="pill" style="margin:16px 0 8px;">Shared screens</div>
+    <div id="screens"></div>
+
+    <hr style="border:none;border-top:1px solid #2b2f43;margin:16px 0;">
+
+    <div class="pill" style="margin-bottom:8px;">Chat</div>
+    <div id="chatLog" class="chat-log"></div>
+
+    <form id="chatForm" class="chat-form">
+      <input id="chatInput" type="text" autocomplete="off" placeholder="Type a message…">
+      <button type="submit">Send</button>
+    </form>
+  </section>
+
+</main>
+
+<footer id="hostFooter" class="host-only panel" style="margin-top: 8px;">
+  <div style="font-weight:700; font-size:18px; margin-bottom:8px;">Share & Host Panel</div>
+
+  <div class="row">
+    <label class="pill">Join link</label>
+    <input id="joinLink" type="text" readonly value="{{ join_link }}">
+    <button id="copyLink">Copy</button>
+  </div>
+
+  <div class="row">
+    <label class="pill">Room ID</label>
+    <input id="roomIdField" type="text" readonly value="{{ room_id }}">
+    <button id="copyRoom">Copy</button>
+  </div>
+
+  <div class="row">
+    <label class="pill">Room Key</label>
+    <input id="roomKeyField" type="text" readonly value="{{ room_key }}">
+    <button id="copyKey">Copy</button>
+  </div>
+
+  <div class="row" style="grid-template-columns:1fr 1fr 1fr;">
+    <button id="hostMuteAll">Mute all</button>
+    <button id="hostKick">Kick participant</button>
+    <button id="hostTransfer" class="ok">Make host…</button>
+  </div>
+</footer>
+
+<script>
+  window.roomId   = "{{ room_id }}";
+  window.username = "{{ username }}";
+  window.isHost   = {{ is_host }};
+  window.joinLink = "{{ join_link }}";
+  window.roomKey  = "{{ room_key }}";
+
+    // ---- preferences from /settings ----
+  window.prefs = {
+    autoCam: {{ pref_auto_cam }},
+    autoMic: {{ pref_auto_mic }},
+    sound: {{ pref_sound }},
+    bg_mode: "{{ pref_bg_mode }}",
+    blur_strength: {{ pref_blur_strength }},
+    bg_src: "{{ pref_bg_src }}",
+    bg_color: "{{ pref_bg_color }}",
+  };
+
+
+  // Tiny beep helper (only if prefs.sound = true)
+  window.playNotify = function () {
+    if (!window.prefs || !window.prefs.sound) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioCtx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.value = 880;
+      g.gain.value = 0.05;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      setTimeout(() => { o.stop(); ctx.close(); }, 120);
+    } catch (e) {}
+  };
+
+
+  if (String(window.isHost) === "true") {
+    document.body.classList.add("is-host");
+  }
+
+  function copyFrom(id) {
+    const el = document.getElementById(id);
+    if (!el || !el.value) return;
+    navigator.clipboard?.writeText(el.value).catch(()=>{});
+  }
+
+  addEventListener("DOMContentLoaded", () => {
+    document.getElementById("copyLink")?.addEventListener("click", () => copyFrom("joinLink"));
+    document.getElementById("copyRoom")?.addEventListener("click", () => copyFrom("roomIdField"));
+    document.getElementById("copyKey") ?.addEventListener("click", () => copyFrom("roomKeyField"));
+  });
+</script>
+
+<script type="module">
+  import * as FilterEngine from "/static/filters_bg.js";
+  window.FilterEngine = FilterEngine;
+</script>
+
+
+
+<script src="/static/Web_Rtc_connection.js"></script>
+</body>
+</html>

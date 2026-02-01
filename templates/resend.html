@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Resend verification • Video Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+
+<body>
+  <header>
+    <div class="pill">🎥 WebRTC</div>
+    <div class="pill">Verification</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h1>Resend verification email</h1>
+      <p>Enter the email you registered with.</p>
+
+      <form method="POST" action="/resend">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="you@example.com" value="{{ email }}">
+
+        <div class="controls">
+          <button type="submit">Resend</button>
+          <a class="btn" href="/">Back to login</a>
+        </div>
+      </form>
+
+      <div class="linkrow">
+        Don’t have an account? <a href="/register">Register</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

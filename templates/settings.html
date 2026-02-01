@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/app.css">
+  <style>
+    .settings-wrap { max-width: 980px; margin: 24px auto; padding: 0 14px; }
+    .tabs { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+    .tab-btn {
+      border:1px solid #2b2f43; background:#141726; color:#e7e9ff;
+      padding:10px 12px; border-radius:10px; cursor:pointer;
+    }
+    .tab-btn.active { background:#1b2040; border-color:#4b5cff; }
+    .tab-panel { display:none; border:1px solid #2b2f43; border-radius:14px; padding:14px; background:#0f1220; }
+    .tab-panel.active { display:block; }
+    .row { display:grid; grid-template-columns: 220px 1fr; gap:10px; align-items:center; margin:10px 0; }
+    .row label { opacity:0.9; }
+    .hint { opacity:0.7; font-size: 13px; margin-top:6px; }
+    .card { border:1px solid #2b2f43; border-radius:12px; padding:12px; margin-top:12px; background:#0c0f1c; }
+    .inline { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    input[type="range"] { width: 260px; }
+
+    .msgwrap { margin: 10px 0 14px; }
+    .badge {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 4px 10px; border-radius: 999px; font-weight: 800;
+      border:1px solid #2b2f43; background:#10131d;
+      margin-left: 8px;
+    }
+    .badge.ok { border-color:#2e6a48; background:#113020; color:#bdf2d3; }
+    .badge.no { border-color:#5a2a3c; background:#2a1720; color:#ffd6df; }
+
+    /* small inputs */
+    input[type="text"], input[type="url"]{
+      width: 100%;
+      max-width: 520px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #2b2f43;
+      background: #0b0e18;
+      color: #e7e9ff;
+      outline: none;
+    }
+    input[type="color"]{
+      width: 54px; height: 34px; border:0; background:transparent; padding:0;
+    }
+    select{
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #2b2f43;
+      background: #0b0e18;
+      color: #e7e9ff;
+      outline: none;
+    }
+    code{ background:#0b0e18; border:1px solid #2b2f43; padding:2px 6px; border-radius:8px; }
+  </style>
+</head>
+
+<body>
+  <div class="settings-wrap">
+    <div class="inline" style="justify-content:space-between;">
+      <div class="inline">
+        <h2 style="margin:0;">Settings</h2>
+        <span id="verifiedBadge" class="badge">Verified: {{ verified }}</span>
+      </div>
+      <a class="btn" href="{{ return_to }}">Back</a>
+    </div>
+
+    <div class="msgwrap">
+      {{ msg_html }}
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Settings tabs">
+      <button class="tab-btn active" data-tab="account"  type="button" role="tab">Account</button>
+      <button class="tab-btn"        data-tab="prefs"    type="button" role="tab">Preferences</button>
+      <button class="tab-btn"        data-tab="filters"  type="button" role="tab">Filters</button>
+      <button class="tab-btn"        data-tab="privacy"  type="button" role="tab">Privacy</button>
+    </div>
+
+    <!-- Account -->
+    <section id="tab-account" class="tab-panel active" role="tabpanel">
+      <h3 style="margin-top:0;">Account</h3>
+      <div class="row"><label>Username</label><div>{{ username }}</div></div>
+      <div class="row"><label>Email</label><div>{{ email }}</div></div>
+      <div class="hint">Account data is read-only here (you can add edit later).</div>
+    </section>
+
+    <!-- Preferences -->
+    <section id="tab-prefs" class="tab-panel" role="tabpanel">
+      <h3 style="margin-top:0;">Preferences</h3>
+
+      <!-- IMPORTANT: your backend listens on POST /settings -->
+      <form method="POST" action="/settings" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="save_prefs">
+        <input type="hidden" name="return_to" value="{{ return_to }}">
+
+        <div class="row">
+          <label>Auto camera on join</label>
+          <div class="inline">
+            <input type="checkbox" name="pref_auto_cam" {{ pref_auto_cam_checked }}>
+            <div class="hint">Start camera automatically when entering a room.</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Auto mic on join</label>
+          <div class="inline">
+            <input type="checkbox" name="pref_auto_mic" {{ pref_auto_mic_checked }}>
+            <div class="hint">If off, you join muted.</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <label>Sounds (join / chat)</label>
+          <div class="inline">
+            <input type="checkbox" name="pref_sound" {{ pref_sound_checked }}>
+            <div class="hint">Enable notification beep.</div>
+          </div>
+        </div>
+
+        <button class="btn" type="submit">Save</button>
+      </form>
+    </section>
+
+    <!-- Filters -->
+    <section id="tab-filters" class="tab-panel" role="tabpanel">
+      <h3 style="margin-top:0;">Filters</h3>
+      <div class="hint">These affect how your camera stream is processed before sending to others.</div>
+
+      <form method="POST" action="/settings" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="save_filters">
+        <input type="hidden" name="return_to" value="{{ return_to }}">
+
+        <div class="card">
+          <div class="row">
+            <label>Background mode</label>
+            <select id="bg_mode" name="bg_mode" data-current="{{ bg_mode }}">
+              <option value="none">None</option>
+              <option value="blur">Blur</option>
+              <option value="image_upload">Upload image</option>
+              <option value="color">Solid color</option>
+            </select>
+          </div>
+
+          <div class="row" id="blur_row">
+            <label>Blur strength</label>
+            <div class="inline">
+              <input type="range" name="blur_strength" min="2" max="24" step="1"
+                     value="12" id="blur_strength">
+              <span id="blur_strength_val">12</span>
+            </div>
+          </div>
+          
+          <div class="row" id="bg_upload_row" style="display:none;">
+            <label>Upload image</label>
+            <div>
+              <input type="file" name="bg_upload" id="bg_upload" accept="image/*">
+              <input type="hidden" name="bg_src" id="bg_src" value="{{ bg_src }}">
+              <div class="hint">We will save the file on the server and store its path.</div>
+              <div id="bg_upload_preview" class="hint" style="margin-top:8px;"></div>
+            </div>
+          </div>
+
+          <div class="row" id="bg_color_row" style="display:none;">
+            <label>Background color</label>
+            <div class="inline">
+              <input type="color" name="bg_color" id="bg_color" value="{{ bg_color }}">
+              <span class="hint">Used only in “Solid color”.</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <label>Face filter</label>
+            <select name="face_filter" id="face_filter" data-current="{{ face_filter }}">
+              <option value="off">Off</option>
+              <option value="beauty">Beauty (soon)</option>
+              <option value="glasses">Glasses (soon)</option>
+              <option value="hat">Hat (soon)</option>
+            </select>
+          </div>
+
+          <button class="btn" type="submit">Save Filters</button>
+        </div>
+      </form>
+
+      <div class="card">
+        <h4 style="margin:0 0 8px;">Preview / Apply</h4>
+        <div class="hint">
+          When you join a room, your selected filters will be applied automatically (client-side).
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section id="tab-privacy" class="tab-panel" role="tabpanel">
+      <h3 style="margin-top:0;">Privacy</h3>
+      <div class="row"><label>Store logs</label><input type="checkbox" disabled></div>
+      <div class="hint">Add privacy controls later (data retention, export, delete account, etc.).</div>
+    </section>
+  </div>
+
+  <script>
+    // Tabs
+    const btns = document.querySelectorAll(".tab-btn");
+    const panels = {
+      account: document.getElementById("tab-account"),
+      prefs: document.getElementById("tab-prefs"),
+      filters: document.getElementById("tab-filters"),
+      privacy: document.getElementById("tab-privacy"),
+    };
+
+    btns.forEach(b => b.addEventListener("click", () => {
+      btns.forEach(x => x.classList.remove("active"));
+      Object.values(panels).forEach(p => p.classList.remove("active"));
+      b.classList.add("active");
+      const key = b.dataset.tab;
+      panels[key].classList.add("active");
+    }));
+
+    // Verified badge styling
+    (function() {
+      const el = document.getElementById("verifiedBadge");
+      if (!el) return;
+      const txt = (el.textContent || "").toLowerCase();
+      const ok = txt.includes("yes") || txt.includes("true") || txt.includes("1");
+      el.classList.toggle("ok", ok);
+      el.classList.toggle("no", !ok);
+      el.textContent = ok ? "Verified: YES" : "Verified: NO";
+    })();
+
+    // ====== Filters: hydrate values coming from server ======
+    const serverBgMode  = "{{ bg_mode }}";
+    const serverBlur    = "{{ blur_strength }}";
+    const serverFace    = "{{ face_filter }}";
+    const serverBgSrc   = "{{ bg_src }}";
+    const serverBgColor = "{{ bg_color }}";
+
+    const bgMode     = document.getElementById("bg_mode");
+    const blurRow    = document.getElementById("blur_row");
+    const bgUploadRow = document.getElementById("bg_upload_row");
+    const bgUploadInp = document.getElementById("bg_upload");
+    const bgUploadPrev = document.getElementById("bg_upload_preview");
+    const bgSrcRow   = document.getElementById("bg_src_row");
+    const bgColorRow = document.getElementById("bg_color_row");
+
+    const blur    = document.getElementById("blur_strength");
+    const blurVal = document.getElementById("blur_strength_val");
+    const faceSel = document.getElementById("face_filter");
+
+    const bgSrcInput   = document.getElementById("bg_src");
+    const bgColorInput = document.getElementById("bg_color");
+    const bgCurrent    = document.getElementById("bg_current");
+
+    // initial values
+    if (bgMode && serverBgMode) bgMode.value = serverBgMode;
+    if (faceSel && serverFace) faceSel.value = serverFace;
+
+    const blurNum = parseInt(serverBlur, 10);
+    const blurInit = Number.isFinite(blurNum) ? blurNum : 12;
+    if (blur) blur.value = String(blurInit);
+    if (blurVal) blurVal.textContent = String(blurInit);
+
+    if (bgSrcInput && serverBgSrc) bgSrcInput.value = serverBgSrc;
+    if (bgColorInput && serverBgColor) bgColorInput.value = serverBgColor;
+
+    function syncFiltersUI() {
+      const mode = bgMode ? bgMode.value : "none";
+
+      if (blurRow) blurRow.style.display = (mode === "blur") ? "grid" : "none";
+      if (bgUploadRow) bgUploadRow.style.display = (mode === "image_upload") ? "grid" : "none";
+      if (bgColorRow) bgColorRow.style.display = (mode === "color") ? "grid" : "none";
+
+      // show saved preview if we already have a bg_src path
+      if (mode === "image_upload" && bgSrcInput && bgSrcInput.value.trim() && bgUploadPrev) {
+        const src = bgSrcInput.value.trim();
+        bgUploadPrev.innerHTML = `
+          <div>Saved image:</div>
+          <img src="${escapeHtml(src)}" style="margin-top:8px;max-width:220px;border-radius:12px;border:1px solid #2b2f43;" />
+          <div class="hint" style="margin-top:6px;"><code>${escapeHtml(src)}</code></div>
+        `;
+      }
+    }
+
+
+    bgUploadInp?.addEventListener("change", () => {
+      const f = bgUploadInp.files?.[0];
+      if (!f) return;
+
+      // Local preview only (server save happens on "Save Filters")
+      const url = URL.createObjectURL(f);
+      if (bgUploadPrev) {
+        bgUploadPrev.innerHTML = `
+          <div>Selected: <code>${escapeHtml(f.name)}</code></div>
+          <img src="${url}" style="margin-top:8px;max-width:220px;border-radius:12px;border:1px solid #2b2f43;" />
+          <div class="hint" style="margin-top:6px;">Click <b>Save Filters</b> to upload.</div>
+        `;
+      }
+    });
+
+
+
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    bgMode?.addEventListener("change", syncFiltersUI);
+    blur?.addEventListener("input", () => { if (blurVal) blurVal.textContent = blur.value; });
+
+    syncFiltersUI();
+  </script>
+</body>
+</html>

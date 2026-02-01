@@ -1,0 +1,142 @@
+#banner {
+  margin-left: auto;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #1f2536;
+  color: #c9d3ff;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) {
+  .grid { grid-template-columns: 360px 1fr; }
+}
+
+video {
+  width: 100%;
+  background: #000;
+  border-radius: 12px;
+  border: 1px solid #2b2f43;
+}
+
+.row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 120px 1fr auto;
+  align-items: center;
+  margin: 10px 0;
+}
+
+footer.host-only { display: none; }
+body.is-host footer.host-only { display: block; }
+
+/* PARTICIPANT GRID */
+#remotes { display: grid; gap: 12px; }
+#remotes.layout-1 { grid-template-columns: minmax(0, 1fr); }
+#remotes.layout-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#remotes.layout-9 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#remotes.layout-many { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+#remotes video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#remotes > div { margin-bottom: 0; }
+
+/* SHARED SCREENS */
+#screens { margin-top: 16px; }
+#screens > div { margin-bottom: 16px; }
+#screens .pill { margin-bottom: 8px; }
+
+/* CHAT */
+.chat-log {
+  background: #10131d;
+  border-radius: 10px;
+  border: 1px solid #2b2f43;
+  padding: 8px 10px;
+  max-height: 260px;
+  min-height: 120px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.chat-line { margin-bottom: 6px; word-break: break-word; }
+.chat-line .from { font-weight: 600; margin-right: 4px; }
+.chat-line.self .from { color: #bdf2d3; }
+.chat-line.other .from { color: #e6e9f2; }
+.chat-line.system { color: var(--muted); font-style: italic; }
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+}
+#chatInput {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #2b2f43;
+  background: #0e111c;
+  color: #e6e9f2;
+}
+#chatInput:focus {
+  outline: none;
+  border-color: #4aa3ff;
+  box-shadow: 0 0 0 1px #4aa3ff33;
+}
+
+/* DEVICES */
+.devices-panel {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px solid #2b2f43;
+}
+.devices-panel .pill { margin-bottom: 8px; }
+
+.device-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.device-row label { color: var(--muted); }
+.device-row select {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #2b2f43;
+  background: #0e111c;
+  color: #e6e9f2;
+  font-size: 13px;
+}
+.device-row select:focus {
+  outline: none;
+  border-color: #4aa3ff;
+  box-shadow: 0 0 0 1px #4aa3ff33;
+}
+.device-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* active speaker highlight */
+.active-speaker {
+  box-shadow: 0 0 20px 4px #4aa3ff99;
+  border: 2px solid #4aa3ff;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+#remotes > div.active-speaker {
+  box-shadow: 0 0 0 2px #4aa3ff99;
+  border-radius: 14px;
+}
